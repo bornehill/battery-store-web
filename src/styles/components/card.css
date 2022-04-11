@@ -1,0 +1,7 @@
+.card {
+	@apply rounded-sm shadow-md;
+}
+
+.card-white {
+	@apply bg-white text-gray-800;
+}

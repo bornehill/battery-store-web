@@ -1,0 +1,67 @@
+.btn {
+	@apply font-normal font-emphasis rounded-sm;
+}
+
+/* Primary Button */
+.btn.btn-primary {
+	@apply bg-yellow-600 text-white py-1 px-5;
+}
+
+.btn.btn-primary:hover,
+.btn.btn-primary:focus {
+	@apply bg-yellow-600 shadow-md;
+}
+
+.btn.btn-primary:active {
+	@apply bg-yellow-600;
+}
+
+.btn.btn-primary:disabled {
+	@apply bg-gray-300 text-onyx-400 cursor-default opacity-75 shadow-none;
+}
+
+/* Secondary Button */
+.btn.btn-secondary {
+	@apply -mx-2 py-1 px-2 text-yellow-600;
+}
+
+.btn.btn-secondary:hover,
+.btn.btn-secondary:focus {
+	@apply bg-red-100 text-yellow-600;
+}
+
+.btn.btn-secondary:active {
+	@apply bg-flame-100;
+}
+
+/* Tertiary Button */
+.btn.btn-tertiary {
+	@apply -mx-2 py-1 px-2 text-yellow-600;
+}
+
+.btn.btn-tertiary:hover,
+.btn.btn-tertiary:focus {
+	@apply bg-red-100 text-yellow-600;
+}
+
+.btn.btn-tertiary:active {
+	@apply bg-flame-100;
+}
+
+.btn.btn-tertiary:disabled {
+	@apply bg-gray-100 text-onyx-400 cursor-default opacity-75;
+}
+
+/* Link-alike Button */
+.btn.btn-link {
+	@apply text-teal-600;
+}
+
+.btn.btn-link:hover,
+.btn.btn-link:focus {
+	@apply text-teal-600 border-b-2 border-teal-600 rounded-none;
+}
+
+.btn.btn-link:active {
+	@apply bg-teal-100 rounded-sm;
+}

@@ -1,0 +1,79 @@
+.table-unwrapper {
+	margin: unset;
+}
+
+.table-wrapper {
+	margin: 10px 20px 70px;
+}
+
+.fl-table {
+	display: block;
+	width: 100%;
+}
+.table-wrapper:before {
+	display: block;
+	padding: 0 0 10px;
+}
+.fl-table thead,
+.fl-table tbody,
+.fl-table thead th {
+	display: block;
+}
+.fl-table thead {
+	float: left;
+}
+.fl-table tbody {
+	width: auto;
+	position: relative;
+	overflow-x: auto;
+}
+.fl-table td,
+.fl-table th {
+	padding: 20px 0.625em 0.625em 0.625em;
+	height: 60px;
+	vertical-align: middle;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: auto;
+	width: 120px;
+	font-size: 13px;
+	text-overflow: ellipsis;
+}
+.fl-table tbody tr {
+	display: table-cell;
+}
+.fl-table tbody td {
+	display: block;
+	text-align: center;
+}
+
+@screen md {
+	.fl-table {
+		display: revert;
+		width: revert;
+	}
+	.fl-table thead,
+	.fl-table tbody,
+	.fl-table thead th {
+		display: revert;
+	}
+	.fl-table thead {
+		float: unset;
+	}
+	.fl-table tbody {
+		width: revert;
+		position: revert;
+		overflow-x: revert;
+	}
+	.fl-table td,
+	.fl-table th {
+		padding: revert;
+		font-size: revert;
+	}
+	.fl-table tbody tr {
+		display: revert;
+	}
+	.fl-table tbody td {
+		display: revert;
+	}
+}

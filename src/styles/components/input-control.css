@@ -1,0 +1,28 @@
+.input-control {
+	@apply flex flex-col my-2;
+}
+
+.input-control > label {
+	@apply font-normal font-emphasis py-1;
+}
+
+.input-control > input {
+	@apply font-light px-3 py-3 rounded-sm border border-gray-400;
+}
+
+.input-control > input:focus {
+	@apply border-flame-400;
+}
+
+.input-control.has-error > input {
+	@apply border-red-700;
+}
+
+.input-control > select {
+	@apply font-light px-3 py-3 rounded-sm border border-gray-400;
+	height: 52px;
+}
+
+.input-control > select:focus {
+	@apply border-flame-400;
+}

@@ -1,0 +1,28 @@
+.loading-bar {
+	@apply h-1 w-full relative;
+	overflow: hidden;
+}
+
+.loading-bar.teal::after {
+	@apply bg-teal-600;
+}
+
+.loading-bar::after {
+	content: "";
+	width: 30%;
+	animation: left-to-right 1.7s ease-in-out infinite;
+	@apply inline-block bg-flame-600 h-full absolute top-0 left-0;
+}
+
+@keyframes left-to-right {
+	0% {
+		left: -30%;
+	}
+	50% {
+		width: 60%;
+	}
+	100% {
+		width: 100%;
+		left: 100%;
+	}
+}

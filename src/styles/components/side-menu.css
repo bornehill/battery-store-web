@@ -1,0 +1,28 @@
+.side-menu {
+	@apply bg-blue-900 text-yellow-600;
+	position: absolute;
+	left: 0;
+	top: 4rem;
+	width: 40vw;
+	padding-bottom: 5vh;
+}
+
+.hide {
+	transform: translate3d(-200vw, 0, 0);
+}
+
+.open {
+	transform: translate3d(0vw, 0, 0);
+}
+
+@screen md {
+	.side-menu {
+		top: 4.6rem;
+		width: 12vw;
+		height: 50vh;
+	}
+
+	.hide {
+		transform: translate3d(-100vw, 0, 0);
+	}
+}
