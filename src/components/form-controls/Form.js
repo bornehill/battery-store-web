@@ -129,6 +129,22 @@ class Form extends Component {
 		);
 	}
 
+	renderDropDownHandled(name, label, options, handleChange, disabled) {
+		const { data, errors } = this.state;
+
+		return (
+			<SelectControl
+				name={name}
+				label={label}
+				value={data[name]}
+				options={options}
+				error={errors[name]}
+				onChange={handleChange}
+				disabled={disabled}
+			/>
+		);
+	}
+
 	renderCheckbox(name, label) {
 		const { data, errors } = this.state;
 

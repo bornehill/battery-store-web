@@ -115,6 +115,38 @@ class StoreService extends BaseService {
 
 		return this.instance.put("/products", product, requestConfig);
 	}
+
+	getInventory(location) {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get(`/inventory/${location}`, config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
+	inputOutput(mov) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.put("/inventory", mov, requestConfig);
+	}
 }
 
 export default new StoreService();
