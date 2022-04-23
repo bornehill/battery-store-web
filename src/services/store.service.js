@@ -147,6 +147,104 @@ class StoreService extends BaseService {
 
 		return this.instance.put("/inventory", mov, requestConfig);
 	}
+
+	addOrder(order) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.post("/order", order, requestConfig);
+	}
+
+	addNote(note) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.post("/note", note, requestConfig);
+	}
+
+	getOrders(query) {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get(`/order?${query}`, config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
+	getEmployees() {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get("/employee", config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
+	addEmployee(employee) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.post("/employee", employee, requestConfig);
+	}
+
+	updateEmployee(employee) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.put("/employee", employee, requestConfig);
+	}
 }
 
 export default new StoreService();

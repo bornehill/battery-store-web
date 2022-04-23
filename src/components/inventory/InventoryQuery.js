@@ -33,7 +33,7 @@ const InventoryQuery = () => {
 	function handleLocationChange(event) {
 		setError("");
 		setLocationSelected(event.target.value);
-
+		setInventory([]);
 		setIsLoading(true);
 		const loc = locations.find((l) => l._id === event.target.value);
 		storeService

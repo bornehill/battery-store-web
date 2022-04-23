@@ -6,43 +6,33 @@ import storeService from "../../services/store.service";
 import Form from "../form-controls/Form";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
-import { Groups } from "../../common/types/Groups";
-import {
-	mapEnumToDropdown,
-	mapListToDropdown,
-} from "../../common/tools/mapEnum";
 
-class ProductForm extends Form {
+class EmployeeForm extends Form {
 	emptyErrors = {
-		brand: "",
-		description: "",
-		group: "",
-		amp: "",
-		price: "",
+		firstName: "",
+		lastName: "",
+		position: "",
+		phone: "",
 	};
 
 	state = {
-		data: this.props.productSelected,
+		data: this.props.employeeSelected,
 		errors: this.emptyErrors,
 		isLoading: false,
 		isShowModal: false,
 	};
 
 	formSchema = {
-		brand: Joi.string(),
-		description: Joi.string()
-			.min(3)
-			.message("Descripcion requerida")
-			.required(),
-		group: Joi.string(),
-		amp: Joi.any(),
-		price: Joi.number().min(100).message("Precio requerido").required(),
+		firstName: Joi.string().min(2).message("Nombre requerido").required(),
+		lastName: Joi.string().min(2).message("Apellido requerido").required(),
+		position: Joi.string(),
+		phone: Joi.any(),
 		id: Joi.any(),
 		_id: Joi.any(),
 		__v: Joi.any(),
 	};
 
-	modalSetting = { ...ModalTemplates.ModalSaveProduct };
+	modalSetting = { ...ModalTemplates.ModalSaveEmployee };
 
 	closeModal = () => {
 		this.modalSetting.show = false;
@@ -55,18 +45,18 @@ class ProductForm extends Form {
 		window.scrollTo(0, 0);
 
 		if (this.state.data.id) {
-			this.updateProduct();
+			this.updateEmployee();
 		} else {
-			this.addProduct();
+			this.addEmployee();
 		}
 	};
 
-	updateProduct = () => {
+	updateEmployee = () => {
 		storeService
-			.updateProduct(this.state.data)
+			.updateEmployee(this.state.data)
 			.then(() => {
 				this.setState({ isLoading: false });
-				this.props.onSuccess("Producto actualizado!");
+				this.props.onSuccess("Empleado actualizado!");
 			})
 			.finally(() => {
 				this.modalSetting.show = false;
@@ -79,12 +69,12 @@ class ProductForm extends Form {
 			.catch((err) => this.props.onError(err?.message ?? "Request error"));
 	};
 
-	addProduct = () => {
+	addEmployee = () => {
 		storeService
-			.addProduct(this.state.data)
+			.addEmployee(this.state.data)
 			.then(() => {
 				this.setState({ isLoading: false });
-				this.props.onSuccess("Producto agregado!");
+				this.props.onSuccess("Empleado agregado!");
 			})
 			.finally(() => {
 				this.modalSetting.show = false;
@@ -99,11 +89,11 @@ class ProductForm extends Form {
 
 	doSubmit = () => {
 		if (this.state.data.id) {
-			this.modalSetting.title = "Actualizar producto";
-			this.modalSetting.msg = "El producto será actualizado. ¿esta seguro?";
+			this.modalSetting.title = "Actualizar empleado";
+			this.modalSetting.msg = "El empleado será actualizado. ¿esta segur@?";
 		} else {
-			this.modalSetting.title = "Agregar Producto";
-			this.modalSetting.msg = "El producto será agregado. ¿esta seguro?";
+			this.modalSetting.title = "Agregar empleado";
+			this.modalSetting.msg = "El empleado será agregado. ¿esta segur@?";
 		}
 
 		this.modalSetting.okFn = this.save;
@@ -114,14 +104,14 @@ class ProductForm extends Form {
 
 	componentDidUpdate() {
 		if (
-			(this.props.productSelected.id && !this.state.data.id) ||
-			(!this.props.productSelected.id && this.state.data.id) ||
-			(this.props.productSelected.id &&
+			(this.props.employeeSelected.id && !this.state.data.id) ||
+			(!this.props.employeeSelected.id && this.state.data.id) ||
+			(this.props.employeeSelected.id &&
 				this.state.data.id &&
-				this.props.productSelected.id !== this.state.data.id)
+				this.props.employeeSelected.id !== this.state.data.id)
 		) {
 			this.setState({
-				data: this.props.productSelected,
+				data: this.props.employeeSelected,
 				errors: this.emptyErrors,
 			});
 		}
@@ -133,26 +123,17 @@ class ProductForm extends Form {
 				<Modal {...this.modalSetting} />
 				<div className="p-5 bg-gray-300">
 					<form
-						key={this.state.data.id ? this.state.data.id : "productForm"}
+						key={this.state.data.id ? this.state.data.id : "employeeForm"}
 						onSubmit={this.handleSubmit}
 						noValidate
 					>
-						{this.renderDropDown(
-							"brand",
-							"Marca",
-							mapListToDropdown(
-								[{ name: "" }, ...this.props.brands],
-								"name",
-								"name"
-							)
-						)}
-						{this.renderInput("description", "Descripcion")}
-						{this.renderInput("price", "Precio", "number")}
-						{this.renderInput("amp", "Amperaje")}
-						{this.renderDropDown("group", "Grupo", mapEnumToDropdown(Groups))}
+						{this.renderInput("firstName", "Nombre")}
+						{this.renderInput("lastName", "Apellido")}
+						{this.renderInput("position", "Puesto")}
+						{this.renderInput("phone", "Tel")}
 						<div className="flex items-center justify-between mt-8">
 							{this.renderSubmit(
-								this.state.data.id ? "Acualizar producto" : "Agregar producto"
+								this.state.data.id ? "Acualizar empleado" : "Agregar empleado"
 							)}
 						</div>
 					</form>
@@ -162,4 +143,4 @@ class ProductForm extends Form {
 	}
 }
 
-export default ProductForm;
+export default EmployeeForm;

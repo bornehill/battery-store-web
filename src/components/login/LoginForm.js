@@ -7,6 +7,7 @@ import authFirebase from "../../common/auth-firebase";
 import Form from "../form-controls/Form";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
+
 class LoginForm extends Form {
 	state = {
 		data: { email: "", password: "" },
@@ -18,11 +19,11 @@ class LoginForm extends Form {
 	formSchema = {
 		email: Joi.string()
 			.email({ tlds: { allow: false } })
-			.message("Enter a valid e-mail"),
+			.message("Ingrese un e-mail valido"),
 		password: Joi.string()
 			.pattern(new RegExp("^[a-zA-Z0-9]{5,30}$"))
 			.message(
-				"Password must be minimum 5 characters length and special characters are not allowed"
+				"La contraseña debe ser minimo de 5 caracteres, no se permiten caracteres especiales"
 			),
 	};
 
@@ -47,7 +48,7 @@ class LoginForm extends Form {
 		const data = { ...this.state.data };
 		if (!data["email"]) {
 			const errors = { ...this.state.errors };
-			errors["email"] = "You must type your email for reset it.";
+			errors["email"] = "Debes escrribir tu email para cambiar la contraseña.";
 
 			this.setState({ errors });
 			return;
@@ -88,7 +89,7 @@ class LoginForm extends Form {
 				<Modal {...this.modalSetting} />
 				<form onSubmit={this.handleSubmit} noValidate>
 					{this.renderInput("email", "E-mail", "email")}
-					{this.renderInput("password", "Password", "password")}
+					{this.renderInput("password", "Contraseña", "password")}
 					<p className="text-sm">
 						Olvidaste la contraseña?{" "}
 						<button
@@ -102,7 +103,7 @@ class LoginForm extends Form {
 					</p>
 					<div className="flex justify-between mt-8">
 						<Link to="/signup" className="btn btn-tertiary">
-							Create account
+							Crear cuenta
 						</Link>
 						{this.renderSubmit("Entrar")}
 					</div>

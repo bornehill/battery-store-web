@@ -38,6 +38,16 @@ export const ModalSaveProduct = {
 	cancelFn: null,
 };
 
+export const ModalSaveEmployee = {
+	show: false,
+	title: "Agregar Empleado",
+	msg: "El empleado sera agregado. ¿Estas segur@?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};
+
 export const ModalUpdateProfile = {
 	show: false,
 	title: "Update Profile",
@@ -54,6 +64,16 @@ export const ModalEmailVerification = {
 	msg: "Email was sent to your register email",
 	okBtn: "Accept",
 	cancelBtn: null,
+	okFn: null,
+	cancelFn: null,
+};
+
+export const ModalSaveNote = {
+	show: false,
+	title: "Agregar Nota",
+	msg: "¿Esta seguro que desea terminar la venta?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
 	okFn: null,
 	cancelFn: null,
 };

@@ -1,10 +1,13 @@
 export function mapEnumToDropdown(enumType) {
-	return Object.keys(enumType).map((typeValue) => {
-		return {
-			value: typeValue,
-			text: enumType[typeValue],
-		};
-	});
+	return [
+		{ value: "", text: "Seleccionar" },
+		...Object.keys(enumType).map((typeValue) => {
+			return {
+				value: typeValue,
+				text: enumType[typeValue],
+			};
+		}),
+	];
 }
 
 export function mapEnumIndexToDropdown(enumType) {

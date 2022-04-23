@@ -1,5 +1,10 @@
 import React from "react";
-import { AiFillEdit, AiFillShop, AiFillSetting } from "react-icons/ai";
+import {
+	AiFillEdit,
+	AiFillShop,
+	AiFillSetting,
+	AiOutlineBook,
+} from "react-icons/ai";
 import {
 	FaUserCircle,
 	FaCashRegister,
@@ -7,7 +12,7 @@ import {
 	FaClipboardList,
 } from "react-icons/fa";
 import { SiBrandfolder } from "react-icons/si";
-import { MdLocationOn } from "react-icons/md";
+import { MdLocationOn, MdPeople } from "react-icons/md";
 
 export function getIcon(icon) {
 	switch (icon) {
@@ -27,6 +32,10 @@ export function getIcon(icon) {
 			return <SiBrandfolder />;
 		case "MdLocationOn":
 			return <MdLocationOn />;
+		case "MdPeople":
+			return <MdPeople />;
+		case "AiOutlineBook":
+			return <AiOutlineBook />;
 		default:
 			return <FaUserCircle />;
 	}

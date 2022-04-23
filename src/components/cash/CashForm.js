@@ -5,62 +5,115 @@ import Form from "../form-controls/Form";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
 
+import storeService from "../../services/store.service";
+
+import { PaymentMethod } from "../../common/types/PaymentMethod";
+import { mapEnumToDropdown } from "../../common/tools/mapEnum";
+
 class CashForm extends Form {
+	emptyErrors = {
+		clientName: "",
+		payment: "",
+		authorizationId: "",
+	};
+
 	state = {
-		data: { sellerName: "", clientName: "" },
-		errors: { sellerName: "", clientName: "" },
+		data: { clientName: "", payment: "", authorizationId: "" },
+		errors: this.emptyErrors,
 		isLoading: false,
 		isShowModal: false,
+		orderId: "0",
 	};
 
 	formSchema = {
-		sellerName: Joi.string()
-			.min(3)
-			.message("Se requiere nombre del vendedor (min: 3 caracteres)"),
 		clientName: Joi.string()
 			.min(3)
 			.message("Se requiere nombre del cliente (min: 3 caracteres)"),
+		payment: Joi.string(),
+		authorizationId: Joi.any(),
 	};
 
-	modalSetting = { ...ModalTemplates.ModalLogin };
+	modalSetting = { ...ModalTemplates.ModalSaveNote };
 
 	closeModal = () => {
 		this.modalSetting.show = false;
 		this.setState({ isShowModal: false });
 	};
 
-	openModal = () => {
-		const data = { ...this.state.data };
-		if (!data["email"]) {
-			const errors = { ...this.state.errors };
-			errors["email"] = "You must type your email for reset it.";
+	addNote = () => {
+		this.setState({ isLoading: true });
+		this.props.onLoading(true);
+		window.scrollTo(0, 0);
 
-			this.setState({ errors });
-			return;
-		}
+		const addNote = {
+			note: {
+				...this.state.data,
+				orderId: this.props.orderId,
+				status: "payed",
+			},
+			location: "San felipe acumuladores",
+		};
 
+		storeService
+			.addNote(addNote)
+			.then(() => {
+				this.props.onSuccess("Venta terminada!");
+				this.setState({
+					isLoading: false,
+					isShowModal: false,
+				});
+			})
+			.finally(() => {
+				this.modalSetting.show = false;
+				this.props.onLoading(false);
+			})
+			.catch((err) => this.props.onError(err?.message ?? "Request error"));
+	};
+
+	doSubmit = () => {
+		this.modalSetting.okFn = this.addNote;
 		this.modalSetting.cancelFn = this.closeModal;
-		this.modalSetting.okFn = this.resetPassword;
 		this.modalSetting.show = true;
 		this.setState({ isShowModal: true });
 	};
 
-	doSubmit = () => {
-		this.setState({ isLoading: true });
-		this.props.onLoading(true);
-	};
+	componentDidUpdate() {
+		if (this.props.orderId !== this.state.orderId) {
+			this.setState({
+				data: this.emptyErrors,
+				orderId: this.props.orderId,
+				errors: this.emptyErrors,
+			});
+		}
+	}
 
 	render() {
 		return (
 			<>
 				<Modal {...this.modalSetting} />
-				<form onSubmit={this.handleSubmit} noValidate className="bt-3">
-					{this.renderInput("sellerName", "Vendedor", "sellerName")}
-					{this.renderInput("clientName", "Cliente", "clientName")}
-					<div className="flex justify-center mt-8 mb-5">
-						{this.renderSubmit("Terminar")}
-					</div>
-				</form>
+				<div className="p-5 bg-gray-300">
+					<form
+						key={this.state.orderId}
+						onSubmit={this.handleSubmit}
+						noValidate
+						className="bt-3"
+					>
+						{this.renderInput("clientName", "Cliente", "clientName")}
+						{this.renderDropDown(
+							"payment",
+							"Pago",
+							mapEnumToDropdown(PaymentMethod)
+						)}
+						{this.renderInput(
+							"authorizationId",
+							"Autorizacion",
+							"authorizationId"
+						)}
+						<div className="flex justify-center mt-8 mb-5">
+							{this.renderSubmit("Terminar")}
+						</div>
+					</form>
+				</div>
 			</>
 		);
 	}

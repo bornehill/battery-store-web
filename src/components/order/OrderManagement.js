@@ -4,7 +4,7 @@ import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
 import SelectControl from "../form-controls/SelectControl";
-import InventoryMovForm from "./InventoryMovForm";
+import InventoryMovForm from "../inventory/InventoryMovForm";
 
 import { GET_FAILURE, PRODUCTS_LOADED } from "../../actions/request";
 import { REQUEST_STATUS } from "../../actions/request-status";
@@ -13,40 +13,33 @@ import { mapListToDropdown } from "../../common/tools/mapEnum";
 import storeService from "../../services/store.service";
 import requestReducer from "../../reducers/request-reducer";
 
-const InventoryManagement = () => {
-	const emptyType = { value: "0", text: "Seleccionar tipo" };
-	const emptyLocation = { _id: "0", name: "Seleccionar Ubicacion" };
+const OrderManagement = () => {
+	const emptySeller = { _id: "0", firstName: "Seleccionar" };
 
 	const emptyMov = {
 		amount: 0,
 		id: "",
 	};
 
-	const typesMov = [
-		emptyType,
-		{ value: "1", text: "Entrada" },
-		{ value: "2", text: "Salida" },
-	];
 	const [isLoading, setIsLoading] = useState(true);
 	const [hasError, setHasError] = useState("");
 	const [error, setError] = useState("");
-	const [locationSelected, setLocationSelected] = useState("0");
+	const [sellerSelected, setSellerSelected] = useState("0");
 	const [movSelected, setMovSelected] = useState(emptyMov);
-	const [typeSelected, setTypeSelected] = useState("0");
 	const [brands, setBrands] = useState([]);
-	const [locations, setLocations] = useState([]);
+	const [sellers, setSellers] = useState([]);
 	const [{ products }, dispatch] = useReducer(requestReducer, {
 		status: REQUEST_STATUS.LOADING,
 		products: [],
 	});
 
 	useEffect(() => {
-		if (locations.length) return;
+		if (sellers.length) return;
 
 		storeService
-			.getLocations()
+			.getEmployees()
 			.then(({ data }) => {
-				if (data) setLocations([emptyLocation, ...data.data]);
+				if (data) setSellers([emptySeller, ...data.data]);
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -55,7 +48,7 @@ const InventoryManagement = () => {
 					error: err,
 				});
 			});
-	}, [locations]);
+	}, [sellers]);
 
 	useEffect(() => {
 		if (brands.length) return;
@@ -73,14 +66,9 @@ const InventoryManagement = () => {
 			});
 	}, [brands]);
 
-	function handleLocationChange(event) {
+	function handleSellerChange(event) {
 		setError("");
-		setLocationSelected(event.target.value);
-	}
-
-	function handleTypeMovChange(event) {
-		setError("");
-		setTypeSelected(event.target.value);
+		setSellerSelected(event.target.value);
 	}
 
 	function handleSuccess(mov) {
@@ -107,19 +95,19 @@ const InventoryManagement = () => {
 		e.preventDefault();
 
 		setError("");
-		if (locationSelected === "0" || typeSelected === "0" || !products.length) {
-			setError("Seleccione Ubicacion, tipo y agregue los productos de E/S.");
+		if (sellerSelected === "0" || !products.length) {
+			setError("Seleccione un vendedor y agregue los productos de la orden.");
 			return;
 		}
 
-		const loc = locations.find((l) => l._id === locationSelected);
+		const seller = sellers.find((l) => l._id === sellerSelected);
 		setHasError("");
 		setIsLoading(true);
 		storeService
-			.inputOutput({
-				products,
-				location: loc.name,
-				typeMov: typeSelected,
+			.addOrder({
+				sellerName: seller.firstName,
+				detail: products,
+				status: "Open",
 			})
 			.then((resp) => {
 				if (!resp === "Success") {
@@ -147,26 +135,17 @@ const InventoryManagement = () => {
 			)}
 			<main className="max-w-screen-xl mx-auto p-4 min-h-screen">
 				<div className="flex items-center justify-between p-4">
-					<h1 className="text-4xl">Entradas/Salidas</h1>
+					<h1 className="text-4xl">Orden</h1>
 				</div>
 				<section className="flex">
 					<div className="md:w-4/6 ">
 						<div className="w-1/3">
 							<SelectControl
-								name="location"
-								label="Ubicacion"
-								value={locationSelected}
-								options={mapListToDropdown(locations, "_id", "name")}
-								onChange={handleLocationChange}
-							/>
-						</div>
-						<div className="w-1/3">
-							<SelectControl
-								name="mov"
-								label="Tipo"
-								value={typeSelected}
-								options={typesMov}
-								onChange={handleTypeMovChange}
+								name="seller"
+								label="Vendedor"
+								value={sellerSelected}
+								options={mapListToDropdown(sellers, "_id", "firstName")}
+								onChange={handleSellerChange}
 							/>
 						</div>
 						<div>
@@ -175,10 +154,11 @@ const InventoryManagement = () => {
 								className="btn btn-primary"
 								onClick={handleSubmit}
 							>
-								Aceptar
+								Agregar
 							</button>
 							{error && <p className="text-sm text-red-700">{error}</p>}
 						</div>
+						<label></label>
 						{products && (
 							<table className="border-separate text-left border-flame-700 mt-5 md:w-2/3">
 								<thead>
@@ -239,4 +219,4 @@ const InventoryManagement = () => {
 	);
 };
 
-export default InventoryManagement;
+export default OrderManagement;
