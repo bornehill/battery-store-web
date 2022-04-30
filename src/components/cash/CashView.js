@@ -4,6 +4,7 @@ import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
 import SelectControl from "../form-controls/SelectControl";
+import InputControl from "../form-controls/InputControl";
 
 import { mapListToDropdown } from "../../common/tools/mapEnum";
 
@@ -14,8 +15,9 @@ const CashView = () => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [error, setError] = useState("");
-	const [total, setTotal] = useState("0");
+	const [subTotal, setSubTotal] = useState(0);
+	const [total, setTotal] = useState(0);
+	const [discount, setDiscount] = useState(0);
 	const [products, setProducts] = useState([]);
 	const [orders, setOrders] = useState([]);
 	const [orderSelected, setOrderSelected] = useState("0");
@@ -36,7 +38,7 @@ const CashView = () => {
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
-				setErrorMessage(err);
+				setErrorMessage(err.message);
 			});
 	};
 
@@ -44,7 +46,16 @@ const CashView = () => {
 		loadOrders();
 		setOrderSelected("0");
 		setProducts([]);
-		setTotal("0");
+		setTotal(0);
+		setSubTotal(0);
+		setDiscount(0);
+	};
+
+	const handleDiscount = (event) => {
+		setDiscount(event.target.value);
+		if (!isNaN(event.target.value) && total > 0) {
+			setTotal(subTotal - +event.target.value);
+		}
 	};
 
 	const handleError = (error) => {
@@ -67,6 +78,8 @@ const CashView = () => {
 			0
 		);
 		setTotal(tot);
+		setSubTotal(tot);
+		setDiscount(0);
 		setProducts(order.detail);
 		setOrderSelected(event.target.value);
 	}
@@ -91,6 +104,13 @@ const CashView = () => {
 								value={orderSelected}
 								options={mapListToDropdown(orders, "orderId", "orderId")}
 								onChange={handleOrderChange}
+							/>
+							<InputControl
+								name={"discount"}
+								label="Descuento"
+								value={discount}
+								type="number"
+								onChange={handleDiscount}
 							/>
 							<label>
 								Total: <span className="font-light text-2xl">${total}</span>
@@ -153,6 +173,7 @@ const CashView = () => {
 							onError={handleError}
 							onLoading={handleLoading}
 							orderId={orderSelected}
+							discount={discount}
 						/>
 					</div>
 				</section>

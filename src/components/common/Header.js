@@ -37,12 +37,10 @@ const Header = () => {
 								>
 									<GiHamburgerMenu onClick={handleOpenMenu} />
 								</IconContext.Provider>
-								<Link className="font-emphasis" to="/">
-									<span className="text-xl text-yellow-600">SanFelipe</span>
-									<span className="font-light text-2xl text-onyx-700">
-										Acumuladores
-									</span>
-								</Link>
+								<span className="text-xl text-yellow-600">SanFelipe</span>
+								<span className="font-light text-2xl text-onyx-700">
+									Acumuladores
+								</span>
 							</div>
 						</div>
 						<SideMenu show={openMenu} />

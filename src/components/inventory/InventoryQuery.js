@@ -15,8 +15,11 @@ const InventoryQuery = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [locationSelected, setLocationSelected] = useState("0");
+	const [brandSelected, setBrandSelected] = useState("0");
 	const [locations, setLocations] = useState([]);
 	const [inventory, setInventory] = useState([]);
+	const [inventoryView, setInventoryView] = useState([]);
+	const [brands, setBrands] = useState([]);
 
 	useEffect(() => {
 		if (locations.length) return;
@@ -30,10 +33,25 @@ const InventoryQuery = () => {
 			.catch((err) => setError(err));
 	}, [locations]);
 
+	useEffect(() => {
+		if (brands.length) return;
+
+		storeService
+			.getBrands()
+			.then(({ data }) => {
+				if (data) setBrands(data.data);
+			})
+			.catch((err) => {
+				setError(err);
+			});
+	}, [brands]);
+
 	function handleLocationChange(event) {
 		setError("");
 		setLocationSelected(event.target.value);
+		setBrandSelected("0");
 		setInventory([]);
+		setInventoryView([]);
 		setIsLoading(true);
 		const loc = locations.find((l) => l._id === event.target.value);
 		storeService
@@ -41,6 +59,7 @@ const InventoryQuery = () => {
 			.then(({ data }) => {
 				if (data.data.length) {
 					setInventory(data.data);
+					setInventoryView(data.data);
 				}
 				setIsLoading(false);
 			})
@@ -49,11 +68,21 @@ const InventoryQuery = () => {
 			});
 	}
 
+	function handleBrandChange(event) {
+		setIsLoading(true);
+		setError("");
+		setBrandSelected(event.target.value);
+		setInventoryView(
+			inventory.filter((i) => i.product.brand === event.target.value)
+		);
+		setIsLoading(false);
+	}
+
 	return (
 		<React.Fragment>
 			<Header />
 			<main>
-				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen">
+				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
 					{isLoading && <LoadingBar />}
 					<div className="p-10">
 						<h1 className="text-4xl">Consulta de inventario</h1>
@@ -65,7 +94,14 @@ const InventoryQuery = () => {
 								options={mapListToDropdown(locations, "_id", "name")}
 								onChange={handleLocationChange}
 							/>
-							{inventory && (
+							<SelectControl
+								name="brand"
+								label="Marca"
+								value={brandSelected}
+								options={mapListToDropdown(brands, "name", "name")}
+								onChange={handleBrandChange}
+							/>
+							{inventoryView && (
 								<table className="border-separate text-left border-flame-700 mt-5 w-full">
 									<thead>
 										<tr>
@@ -78,30 +114,28 @@ const InventoryQuery = () => {
 										</tr>
 										<tr className="text-center text-blue-900">
 											<th className="border-blue-900 font-light">Marca</th>
-											<th className="border-blue-900 font-light hidden md:table-cell">
+											<th className="border-blue-900 font-light">
 												Descripcion
 											</th>
 											<th className="border-blue-900 font-light hidden md:table-cell">
 												Grupo
 											</th>
-											<th className="border-blue-900 font-light hidden md:table-cell">
-												Existencia
-											</th>
+											<th className="border-blue-900 font-light">Existencia</th>
 										</tr>
 									</thead>
 									<tbody>
-										{inventory.map((mov) => (
-											<tr className="text-gray-800" key={mov.product.id}>
+										{inventoryView.map((mov) => (
+											<tr className="text-gray-800" key={mov.product._id}>
 												<td className="border-t-2 border-yellow-600 font-light px-2">
 													{mov.product.brand}
 												</td>
-												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+												<td className="border-t-2 border-yellow-600 font-light px-2">
 													{mov.product.description}
 												</td>
 												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
 													{mov.product.group}
 												</td>
-												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+												<td className="border-t-2 border-yellow-600 font-light px-2">
 													{mov.amount}
 												</td>
 											</tr>

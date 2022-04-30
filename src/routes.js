@@ -3,11 +3,13 @@ import { Route } from "react-router-dom";
 import Home from "./components/home/Home";
 import SignupView from "./components/login/SignupView";
 import CashView from "./components/cash/CashView";
+import CutoffView from "./components/cash/CutoffView";
 import BrandManagement from "./components/inventory/BrandManagement";
 import InventoryManagement from "./components/inventory/InventoryManagement";
 import InventoryQuery from "./components/inventory/InventoryQuery";
-import LocationManagement from "./components/inventory/LocationManagement";
 import EmployeeManagement from "./components/employee/EmployeeManagement";
+import LocationManagement from "./components/inventory/LocationManagement";
+import NoteDetail from "./components/note/NoteDetail";
 import ProductManagement from "./components/inventory/ProductManagement";
 import OrderManagement from "./components/order/OrderManagement";
 import LoginView from "./components/login/LoginView";
@@ -21,6 +23,11 @@ export const routes = [
 	{
 		path: "/cash",
 		component: CashView,
+		exact: true,
+	},
+	{
+		path: "/cutoff",
+		component: CutoffView,
 		exact: true,
 	},
 	{
@@ -58,6 +65,10 @@ export const routes = [
 	{
 		path: "/signup",
 		component: SignupView,
+	},
+	{
+		path: "/note/:noteId",
+		component: NoteDetail,
 	},
 ];
 

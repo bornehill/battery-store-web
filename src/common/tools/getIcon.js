@@ -8,6 +8,7 @@ import {
 import {
 	FaUserCircle,
 	FaCashRegister,
+	FaFileInvoiceDollar,
 	FaStore,
 	FaClipboardList,
 } from "react-icons/fa";
@@ -24,6 +25,8 @@ export function getIcon(icon) {
 			return <AiFillSetting />;
 		case "FaCashRegister":
 			return <FaCashRegister />;
+		case "FaFileInvoiceDollar":
+			return <FaFileInvoiceDollar />;
 		case "FaStore":
 			return <FaStore />;
 		case "FaClipboardList":

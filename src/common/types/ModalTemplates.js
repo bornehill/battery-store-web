@@ -77,3 +77,13 @@ export const ModalSaveNote = {
 	okFn: null,
 	cancelFn: null,
 };
+
+export const ModalCancelNote = {
+	show: false,
+	title: "Cancelar Nota",
+	msg: "¿Desea cancelar la nota?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};

@@ -50,6 +50,7 @@ class CashForm extends Form {
 				...this.state.data,
 				orderId: this.props.orderId,
 				status: "payed",
+				discount: this.props.discount,
 			},
 			location: "San felipe acumuladores",
 		};
