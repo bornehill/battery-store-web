@@ -5,62 +5,47 @@ import Form from "../form-controls/Form";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
 
-import storeService from "../../services/store.service";
-
-import { PaymentMethod } from "../../common/types/PaymentMethod";
+import { ProfileType } from "../../common/types/ProfileType";
 import { mapEnumToDropdown } from "../../common/tools/mapEnum";
 
-class CashForm extends Form {
+import AuthService from "../../services/auth.service";
+
+class ProfileForm extends Form {
 	emptyErrors = {
-		clientName: "",
-		payment: "",
-		authorizationId: "",
-		noteNo: "",
+		nickName: "",
+		role: "",
 	};
 
 	state = {
-		data: { clientName: "", payment: "", authorizationId: "", noteNo: "" },
+		data: this.props.profileSelected,
 		errors: this.emptyErrors,
 		isLoading: false,
 		isShowModal: false,
-		orderId: "0",
 	};
 
 	formSchema = {
-		clientName: Joi.string()
-			.min(3)
-			.message("Se requiere nombre del cliente (min: 3 caracteres)"),
-		payment: Joi.string(),
-		authorizationId: Joi.any(),
-		noteNo: Joi.any(),
+		nickName: Joi.any(),
+		role: Joi.string().min(1).message("Perfil requerido").required(),
+		userUid: Joi.string().min(1).message("Seleccione un usuario").required(),
+		_id: Joi.any(),
+		__v: Joi.any(),
 	};
 
-	modalSetting = { ...ModalTemplates.ModalSaveNote };
+	modalSetting = { ...ModalTemplates.ModalSaveProfile };
 
 	closeModal = () => {
 		this.modalSetting.show = false;
 		this.setState({ isShowModal: false });
 	};
 
-	addNote = () => {
+	saveProfile = () => {
 		this.setState({ isLoading: true });
 		this.props.onLoading(true);
 		window.scrollTo(0, 0);
 
-		const addNote = {
-			note: {
-				...this.state.data,
-				orderId: this.props.orderId,
-				status: "payed",
-				discount: this.props.discount,
-			},
-			location: "San felipe acumuladores",
-		};
-
-		storeService
-			.addNote(addNote)
+		AuthService.updateProfile(this.state.data)
 			.then(() => {
-				this.props.onSuccess("Venta terminada!");
+				this.props.onSuccess(this.state.data);
 				this.setState({
 					isLoading: false,
 					isShowModal: false,
@@ -74,17 +59,16 @@ class CashForm extends Form {
 	};
 
 	doSubmit = () => {
-		this.modalSetting.okFn = this.addNote;
+		this.modalSetting.okFn = this.saveProfile;
 		this.modalSetting.cancelFn = this.closeModal;
 		this.modalSetting.show = true;
 		this.setState({ isShowModal: true });
 	};
 
 	componentDidUpdate() {
-		if (this.props.orderId !== this.state.orderId) {
+		if (this.props.profileSelected.userUid !== this.state.data.userUid) {
 			this.setState({
-				data: this.emptyErrors,
-				orderId: this.props.orderId,
+				data: this.props.profileSelected,
 				errors: this.emptyErrors,
 			});
 		}
@@ -96,25 +80,19 @@ class CashForm extends Form {
 				<Modal {...this.modalSetting} />
 				<div className="p-5 bg-gray-300">
 					<form
-						key={this.state.orderId}
+						key={this.state.userUid}
 						onSubmit={this.handleSubmit}
 						noValidate
 						className="bt-3"
 					>
-						{this.renderInput("clientName", "Cliente", "clientName")}
+						{this.renderInput("nickName", "Nickname", "nickName")}
 						{this.renderDropDown(
-							"payment",
-							"Pago",
-							mapEnumToDropdown(PaymentMethod)
+							"role",
+							"Perfil",
+							mapEnumToDropdown(ProfileType)
 						)}
-						{this.renderInput(
-							"authorizationId",
-							"Autorizacion",
-							"authorizationId"
-						)}
-						{this.renderInput("noteNo", "No. nota", "noteNo")}
 						<div className="flex justify-center mt-8 mb-5">
-							{this.renderSubmit("Terminar")}
+							{this.renderSubmit("Guardar")}
 						</div>
 					</form>
 				</div>
@@ -123,4 +101,4 @@ class CashForm extends Form {
 	}
 }
 
-export default CashForm;
+export default ProfileForm;

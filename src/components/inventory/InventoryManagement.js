@@ -116,7 +116,7 @@ const InventoryManagement = () => {
 		setHasError("");
 		setIsLoading(true);
 		storeService
-			.inputOutput({
+			.invrequest({
 				products,
 				location: loc.name,
 				typeMov: typeSelected,

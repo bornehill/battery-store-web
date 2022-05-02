@@ -5,51 +5,41 @@ import format from "date-fns/format";
 import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
-import { PaymentMethod } from "../../common/types/PaymentMethod";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
 
 import storeService from "../../services/store.service";
 
-const NoteDetail = (props) => {
+const InventoryRequestDetail = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [note, setNote] = useState(props.location.query?.note);
+	const [request, setRequest] = useState(props.location.query?.request);
 	const [modalSetting, setModalSetting] = useState({
-		...ModalTemplates.ModalCancelNote,
+		...ModalTemplates.ModalAuthRequest,
 	});
-
-	const getNoteTotal = (order, discount) => {
-		const subTotal = order.detail.reduce(
-			(previousValue, p) => previousValue + +p.amount * +p.product.price,
-			0
-		);
-
-		return discount ? subTotal - discount : subTotal;
-	};
 
 	const closeModal = () => {
 		setModalSetting({ ...modalSetting, show: false });
 	};
 
-	const handleCancelNote = () => {
+	const handleAuthRequest = () => {
 		setErrorMessage("");
 		setModalSetting({
 			...modalSetting,
-			okFn: cancelNote,
+			okFn: authRequest,
 			cancelFn: closeModal,
 			show: true,
 		});
 	};
 
-	const cancelNote = () => {
+	const authRequest = () => {
 		setIsLoading(true);
 		setModalSetting({ ...modalSetting, show: false });
 
 		storeService
-			.cancelNote(note.noteId)
+			.inputOutput(request)
 			.then(({ data }) => {
-				setNote({ ...note, status: "canceled" });
+				setRequest({ ...request, status: "canceled" });
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -67,57 +57,25 @@ const NoteDetail = (props) => {
 			)}
 			<main className="max-w-screen-xl mx-auto p-4 min-h-screen">
 				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
-					<h1 className="text-4xl text-center">Detalle de nota</h1>
-					{note && (
+					<h1 className="text-4xl text-center">Detalle de movimiento</h1>
+					{request && (
 						<>
 							<table className="border-separate text-left border-flame-700 mt-5 w-full">
 								<tbody>
 									<tr>
 										<th className="border-t-2 border-yellow-900 text-center">
-											Nota
+											Ubicacion
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{note.noteNo ?? note.noteId}
+											{request.location}
 										</td>
 									</tr>
 									<tr>
 										<th className="border-t-2 border-yellow-900 text-center">
-											Cliente
+											Tipo de movimiento
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{note.clientName}
-										</td>
-									</tr>
-									<tr>
-										<th className="border-t-2 border-yellow-900 text-center">
-											Tipo Pago
-										</th>
-										<td className="border-t-2 border-yellow-900 text-center">
-											{PaymentMethod[note.payment]}
-										</td>
-									</tr>
-									<tr>
-										<th className="border-t-2 border-yellow-900 text-center">
-											Fecha/Hora
-										</th>
-										<td className="border-t-2 border-yellow-900 text-center">
-											{format(new Date(note.date), "dd/MM/yyyy HH:mm:ss")}
-										</td>
-									</tr>
-									<tr>
-										<th className="border-t-2 border-yellow-900 text-center">
-											Descuento
-										</th>
-										<td className="border-t-2 border-yellow-900 text-center">
-											${note.discount ?? 0}
-										</td>
-									</tr>
-									<tr>
-										<th className="border-t-2 border-yellow-900 text-center">
-											Total
-										</th>
-										<td className="border-t-2 border-yellow-900 text-center">
-											${getNoteTotal(note.order, note.discount)}
+											{request.typeMov === 1 ? "Entrada" : "Salida"}
 										</td>
 									</tr>
 								</tbody>
@@ -140,31 +98,19 @@ const NoteDetail = (props) => {
 										<th className="border-blue-900 font-light hidden md:table-cell">
 											Cantidad
 										</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Precio
-										</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											SubTotal
-										</th>
 									</tr>
 								</thead>
 								<tbody>
-									{note.order.detail.map((d) => (
-										<tr className="text-gray-800" key={d.product._id}>
+									{request.products.map((p) => (
+										<tr className="text-gray-800" key={p.product._id}>
 											<td className="border-t-2 border-yellow-600 font-light px-2">
-												{d.product.brand}
+												{p.product.brand}
 											</td>
 											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												{d.product.description}
+												{p.product.description}
 											</td>
 											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												{d.amount}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												$ {d.product.price}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												$ {+d.amount * +d.product.price}
+												{p.amount}
 											</td>
 										</tr>
 									))}
@@ -173,17 +119,17 @@ const NoteDetail = (props) => {
 						</>
 					)}
 					<div className="flex justify-between">
-						<Link to="/cutoff" className="btn btn-tertiary">
+						<Link to="/invrequest" className="btn btn-tertiary">
 							Regresar
 						</Link>
-						{note && (
+						{request && (
 							<button
 								className="btn btn-primary cursor-pointer font-bold"
 								type="button"
-								onClick={handleCancelNote}
-								disabled={isLoading || note.status === "canceled"}
+								onClick={handleAuthRequest}
+								disabled={isLoading || request.status === "canceled"}
 							>
-								Cancelar Nota
+								Autorizar
 							</button>
 						)}
 					</div>
@@ -194,4 +140,4 @@ const NoteDetail = (props) => {
 	);
 };
 
-export default NoteDetail;
+export default InventoryRequestDetail;

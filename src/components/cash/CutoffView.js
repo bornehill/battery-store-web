@@ -171,7 +171,7 @@ const CutoffView = () => {
 												key={note._id}
 											>
 												<td className="border-t-2 border-yellow-600 font-light px-2">
-													{note.noteId}
+													{note.noteNo ?? note.noteId}
 												</td>
 												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
 													{note.payment && PaymentMethod[note.payment]}

@@ -29,25 +29,25 @@ export const AuthProvider = ({ children }) => {
 			.then((token) => {
 				localStorage.setItem("token", token);
 				setAuthToken(token);
-				//getProfile();
+				getProfile();
 			});
 	};
 
-	// const getProfile = () => {
-	// 	if (!currentUser) return;
+	const getProfile = () => {
+		if (!currentUser) return;
 
-	// 	authService
-	// 		.getProfile(currentUser.uid, authToken)
-	// 		.then(({ data }) => {
-	// 			if (data?.data) {
-	// 				setProfile(data?.data);
-	// 			}
-	// 		})
-	// 		.finally(() => {
-	// 			setStatusProfile(REQUEST_STATUS.PROFILE_LOADED);
-	// 		})
-	// 		.catch();
-	// };
+		authService
+			.getProfile(currentUser.uid, authToken)
+			.then(({ data }) => {
+				if (data?.data) {
+					setProfile(data?.data);
+				}
+			})
+			.finally(() => {
+				setStatusProfile(REQUEST_STATUS.PROFILE_LOADED);
+			})
+			.catch();
+	};
 
 	return (
 		<AuthContext.Provider

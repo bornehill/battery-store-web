@@ -6,11 +6,14 @@ import {
 	AiOutlineBook,
 } from "react-icons/ai";
 import {
+	FaBookReader,
+	FaUnlockAlt,
 	FaUserCircle,
 	FaCashRegister,
+	FaClipboardList,
 	FaFileInvoiceDollar,
 	FaStore,
-	FaClipboardList,
+	FaUsersCog,
 } from "react-icons/fa";
 import { SiBrandfolder } from "react-icons/si";
 import { MdLocationOn, MdPeople } from "react-icons/md";
@@ -39,6 +42,12 @@ export function getIcon(icon) {
 			return <MdPeople />;
 		case "AiOutlineBook":
 			return <AiOutlineBook />;
+		case "FaBookReader":
+			return <FaBookReader />;
+		case "FaUsersCog":
+			return <FaUsersCog />;
+		case "FaUnlockAlt":
+			return <FaUnlockAlt />;
 		default:
 			return <FaUserCircle />;
 	}

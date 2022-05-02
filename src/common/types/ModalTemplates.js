@@ -87,3 +87,33 @@ export const ModalCancelNote = {
 	okFn: null,
 	cancelFn: null,
 };
+
+export const ModalCancelOrder = {
+	show: false,
+	title: "Cancelar Orden",
+	msg: "¿Desea cancelar la orden?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};
+
+export const ModalSaveProfile = {
+	show: false,
+	title: "Guardar Perfil",
+	msg: "¿Desea guardar los cambios?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};
+
+export const ModalAuthRequest = {
+	show: false,
+	title: "Autorizar E/S",
+	msg: "¿Desea autorizar el movimiento?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};

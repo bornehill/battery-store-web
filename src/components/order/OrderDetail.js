@@ -5,51 +5,48 @@ import format from "date-fns/format";
 import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
-import { PaymentMethod } from "../../common/types/PaymentMethod";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
 
 import storeService from "../../services/store.service";
 
-const NoteDetail = (props) => {
+const OrderDetail = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [note, setNote] = useState(props.location.query?.note);
+	const [order, setOrder] = useState(props.location.query?.order);
 	const [modalSetting, setModalSetting] = useState({
-		...ModalTemplates.ModalCancelNote,
+		...ModalTemplates.ModalCancelOrder,
 	});
 
-	const getNoteTotal = (order, discount) => {
-		const subTotal = order.detail.reduce(
+	const getOrderTotal = () => {
+		return order.detail.reduce(
 			(previousValue, p) => previousValue + +p.amount * +p.product.price,
 			0
 		);
-
-		return discount ? subTotal - discount : subTotal;
 	};
 
 	const closeModal = () => {
 		setModalSetting({ ...modalSetting, show: false });
 	};
 
-	const handleCancelNote = () => {
+	const handleCancelOrder = () => {
 		setErrorMessage("");
 		setModalSetting({
 			...modalSetting,
-			okFn: cancelNote,
+			okFn: cancelOrder,
 			cancelFn: closeModal,
 			show: true,
 		});
 	};
 
-	const cancelNote = () => {
+	const cancelOrder = () => {
 		setIsLoading(true);
 		setModalSetting({ ...modalSetting, show: false });
 
 		storeService
-			.cancelNote(note.noteId)
+			.cancelOrder(order.orderId)
 			.then(({ data }) => {
-				setNote({ ...note, status: "canceled" });
+				setOrder({ ...order, status: "canceled" });
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -67,33 +64,25 @@ const NoteDetail = (props) => {
 			)}
 			<main className="max-w-screen-xl mx-auto p-4 min-h-screen">
 				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
-					<h1 className="text-4xl text-center">Detalle de nota</h1>
-					{note && (
+					<h1 className="text-4xl text-center">Detalle de orden</h1>
+					{order && (
 						<>
 							<table className="border-separate text-left border-flame-700 mt-5 w-full">
 								<tbody>
 									<tr>
 										<th className="border-t-2 border-yellow-900 text-center">
-											Nota
+											Orden
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{note.noteNo ?? note.noteId}
+											{order.orderId}
 										</td>
 									</tr>
 									<tr>
 										<th className="border-t-2 border-yellow-900 text-center">
-											Cliente
+											Vendedor
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{note.clientName}
-										</td>
-									</tr>
-									<tr>
-										<th className="border-t-2 border-yellow-900 text-center">
-											Tipo Pago
-										</th>
-										<td className="border-t-2 border-yellow-900 text-center">
-											{PaymentMethod[note.payment]}
+											{order.sellerName}
 										</td>
 									</tr>
 									<tr>
@@ -101,15 +90,7 @@ const NoteDetail = (props) => {
 											Fecha/Hora
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{format(new Date(note.date), "dd/MM/yyyy HH:mm:ss")}
-										</td>
-									</tr>
-									<tr>
-										<th className="border-t-2 border-yellow-900 text-center">
-											Descuento
-										</th>
-										<td className="border-t-2 border-yellow-900 text-center">
-											${note.discount ?? 0}
+											{format(new Date(order.date), "dd/MM/yyyy HH:mm:ss")}
 										</td>
 									</tr>
 									<tr>
@@ -117,7 +98,7 @@ const NoteDetail = (props) => {
 											Total
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											${getNoteTotal(note.order, note.discount)}
+											${getOrderTotal()}
 										</td>
 									</tr>
 								</tbody>
@@ -149,7 +130,7 @@ const NoteDetail = (props) => {
 									</tr>
 								</thead>
 								<tbody>
-									{note.order.detail.map((d) => (
+									{order.detail.map((d) => (
 										<tr className="text-gray-800" key={d.product._id}>
 											<td className="border-t-2 border-yellow-600 font-light px-2">
 												{d.product.brand}
@@ -173,17 +154,17 @@ const NoteDetail = (props) => {
 						</>
 					)}
 					<div className="flex justify-between">
-						<Link to="/cutoff" className="btn btn-tertiary">
+						<Link to="/checkorders" className="btn btn-tertiary">
 							Regresar
 						</Link>
-						{note && (
+						{order && (
 							<button
 								className="btn btn-primary cursor-pointer font-bold"
 								type="button"
-								onClick={handleCancelNote}
-								disabled={isLoading || note.status === "canceled"}
+								onClick={handleCancelOrder}
+								disabled={isLoading || order.status === "canceled"}
 							>
-								Cancelar Nota
+								Cancelar Orden
 							</button>
 						)}
 					</div>
@@ -194,4 +175,4 @@ const NoteDetail = (props) => {
 	);
 };
 
-export default NoteDetail;
+export default OrderDetail;

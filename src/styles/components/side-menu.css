@@ -4,6 +4,7 @@
 	left: 0;
 	top: 4rem;
 	width: 40vw;
+	height: 87vh;
 	padding-bottom: 5vh;
 	z-index: 99;
 }
@@ -20,7 +21,7 @@
 	.side-menu {
 		top: 4.6rem;
 		width: 12vw;
-		height: 50vh;
+		height: 60vh;
 	}
 
 	.hide {

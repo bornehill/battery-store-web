@@ -12,7 +12,12 @@ import LocationManagement from "./components/inventory/LocationManagement";
 import NoteDetail from "./components/note/NoteDetail";
 import ProductManagement from "./components/inventory/ProductManagement";
 import OrderManagement from "./components/order/OrderManagement";
+import OrdersView from "./components/order/OrdersView";
+import OrderDetail from "./components/order/OrderDetail";
+import ProfileManagement from "./components/profile/ProfileManagement";
 import LoginView from "./components/login/LoginView";
+import InventoryRequestView from "./components/inventory/InventoryRequestView";
+import InventoryRequestDetail from "./components/inventory/InventoryRequestDetail";
 
 export const routes = [
 	{
@@ -63,12 +68,32 @@ export const routes = [
 		component: OrderManagement,
 	},
 	{
+		path: "/orderdetail/:orderId",
+		component: OrderDetail,
+	},
+	{
 		path: "/signup",
 		component: SignupView,
 	},
 	{
 		path: "/note/:noteId",
 		component: NoteDetail,
+	},
+	{
+		path: "/checkorders",
+		component: OrdersView,
+	},
+	{
+		path: "/profile",
+		component: ProfileManagement,
+	},
+	{
+		path: "/invrequest",
+		component: InventoryRequestView,
+	},
+	{
+		path: "/authrequest/:id",
+		component: InventoryRequestDetail,
 	},
 ];
 

@@ -11,22 +11,27 @@ import { getIcon } from "../../common/tools/getIcon";
 import Modal from "../common/Modal";
 
 const SideMenu = ({ show }) => {
-	const { authToken } = useContext(AuthContext);
+	const { authToken, profile } = useContext(AuthContext);
 
 	const history = useHistory();
 	const [showModal, setShowModal] = useState(false);
 	const [menu, setMenu] = useState([]);
 
 	useEffect(() => {
+		if (menu.length) return;
+
 		authService
 			.userMenu(authToken)
 			.then(({ data }) => {
-				if (data.data?.length) {
-					setMenu(data.data);
+				if (data.data?.length && profile) {
+					const menu = data.data.filter((m) =>
+						m.role.find((r) => r === profile.role)
+					);
+					setMenu(menu);
 				}
 			})
 			.catch();
-	}, [authToken]);
+	}, [authToken, profile]);
 
 	function displayModal() {
 		setShowModal(true);

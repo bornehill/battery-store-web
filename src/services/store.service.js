@@ -148,6 +148,38 @@ class StoreService extends BaseService {
 		return this.instance.put("/inventory", mov, requestConfig);
 	}
 
+	getInvRequest() {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get("/invrequest", config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
+	invrequest(mov) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.post("/invrequest", mov, requestConfig);
+	}
+
 	addOrder(order) {
 		const token = localStorage.getItem("token");
 
@@ -195,6 +227,42 @@ class StoreService extends BaseService {
 		}
 
 		return Promise.resolve({ data: null });
+	}
+
+	getOrdersBySeller(query) {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get(`/orders?${query}`, config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
+	cancelOrder(orderId) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.put(
+			`/order/${orderId}`,
+			{ status: "canceled" },
+			requestConfig
+		);
 	}
 
 	getEmployees() {
@@ -261,7 +329,7 @@ class StoreService extends BaseService {
 		return Promise.resolve({ data: null });
 	}
 
-	updateNoteStatus(noteId, status) {
+	cancelNote(noteId) {
 		const token = localStorage.getItem("token");
 
 		const requestConfig = {
@@ -275,7 +343,7 @@ class StoreService extends BaseService {
 			],
 		};
 
-		return this.instance.post(`/note/${noteId}`, status, requestConfig);
+		return this.instance.post(`/note/${noteId}`, {}, requestConfig);
 	}
 }
 
