@@ -3,4 +3,7 @@ export const PaymentMethod = {
 	debitCard: "Tarjeta debito",
 	creditCard: "Tarjeta credito",
 	credit: "Credito",
+	transfer: "Transferencia",
+	cheque: "Cheque",
+	helmet: "Casco",
 };

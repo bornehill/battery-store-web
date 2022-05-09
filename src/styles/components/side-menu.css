@@ -2,8 +2,8 @@
 	@apply bg-blue-900 text-yellow-600;
 	position: absolute;
 	left: 0;
-	top: 4rem;
-	width: 40vw;
+	top: 6rem;
+	width: 50vw;
 	height: 87vh;
 	padding-bottom: 5vh;
 	z-index: 99;
@@ -19,9 +19,9 @@
 
 @screen md {
 	.side-menu {
-		top: 4.6rem;
+		top: 5.1rem;
 		width: 12vw;
-		height: 60vh;
+		height: 65vh;
 	}
 
 	.hide {

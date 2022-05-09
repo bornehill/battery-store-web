@@ -8,6 +8,7 @@ import * as ModalTemplates from "../../common/types/ModalTemplates";
 import storeService from "../../services/store.service";
 
 import { PaymentMethod } from "../../common/types/PaymentMethod";
+import { NoteStatus } from "../../common/types/NoteStatus";
 import { mapEnumToDropdown } from "../../common/tools/mapEnum";
 
 class CashForm extends Form {
@@ -43,15 +44,26 @@ class CashForm extends Form {
 	};
 
 	addNote = () => {
+		let status = NoteStatus.payed;
+
 		this.setState({ isLoading: true });
 		this.props.onLoading(true);
 		window.scrollTo(0, 0);
+
+		switch (PaymentMethod[this.state.data.payment]) {
+			case PaymentMethod.credit:
+				status = NoteStatus.credit;
+				break;
+			case PaymentMethod.helmet:
+				status = NoteStatus.preauth;
+				break;
+		}
 
 		const addNote = {
 			note: {
 				...this.state.data,
 				orderId: this.props.orderId,
-				status: "payed",
+				status,
 				discount: this.props.discount,
 			},
 			location: "San felipe acumuladores",
@@ -109,7 +121,7 @@ class CashForm extends Form {
 						)}
 						{this.renderInput(
 							"authorizationId",
-							"Autorizacion",
+							"Autorizacion/No cheque",
 							"authorizationId"
 						)}
 						{this.renderInput("noteNo", "No. nota", "noteNo")}

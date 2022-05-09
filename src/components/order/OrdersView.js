@@ -39,15 +39,10 @@ const OrdersView = () => {
 	const getOrders = (sellerId, start) => {
 		setIsLoading(true);
 
-		const end = format(
-			new Date(start).getTime() + 86400000 * 1.3,
-			"yyyy-MM-dd"
-		);
-
 		const sellerName = sellers.find((s) => s._id === sellerId).firstName;
 
 		storeService
-			.getOrdersBySeller(`seller=${sellerName}&start=${start}&end=${end}`)
+			.getOrdersBySeller(`seller=${sellerName}&start=${start}`)
 			.then(({ data }) => {
 				if (data) {
 					const filtered = data.data.filter(

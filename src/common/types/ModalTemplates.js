@@ -117,3 +117,13 @@ export const ModalAuthRequest = {
 	okFn: null,
 	cancelFn: null,
 };
+
+export const ModalCreditPayment = {
+	show: false,
+	title: "Pagar credito",
+	msg: "¿Desea pagar el credito?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};

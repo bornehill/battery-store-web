@@ -5,60 +5,34 @@ import format from "date-fns/format";
 import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
-import InputControl from "../form-controls/InputControl";
 import Paginate from "../common/Paginate";
 import { PaymentMethod } from "../../common/types/PaymentMethod";
 import { NoteStatus } from "../../common/types/NoteStatus";
 
 import storeService from "../../services/store.service";
 
-const CutoffView = () => {
-	const emptyNote = { _id: "0" };
-
+const NotesPrecanceled = (props) => {
+	const [status, setStatus] = useState(props.match.params.status);
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [dateCutoff, setDateCutoff] = useState(
-		format(Date.now(), "yyyy-MM-dd")
-	);
 	const [notes, setNotes] = useState([]);
-	const [totals, setTotals] = useState([]);
 	const [notesView, setNotesView] = useState([]);
-	const [payments, setPayments] = useState([]);
 	const [page, setPage] = useState(1);
+	const [totals, setTotals] = useState([]);
 
 	useEffect(() => {
 		if (notes.length) return;
 
-		loadNotes(dateCutoff);
+		loadNotes();
 	}, [notes]);
 
-	useEffect(() => {
-		if (payments.length) return;
-
-		loadPayments(dateCutoff);
-	}, [notes]);
-
-	const loadNotes = (start) => {
+	const loadNotes = () => {
 		setIsLoading(true);
 
 		storeService
-			.getNotes(`start=${start}`)
+			.getNotesByStatus(status)
 			.then(({ data }) => {
 				if (data?.data?.length) handleNotes([...data.data]);
-			})
-			.finally(() => setIsLoading(false))
-			.catch((err) => {
-				setErrorMessage(err.message);
-			});
-	};
-
-	const loadPayments = (start) => {
-		setIsLoading(true);
-
-		storeService
-			.getPayments(`start=${start}`)
-			.then(({ data }) => {
-				if (data?.data?.length) setPayments([...data.data]);
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -70,22 +44,17 @@ const CutoffView = () => {
 		setNotes(notes);
 		setNotesView(notes.slice(0, 10));
 		setPage(1);
-		const totals = notes
-			.filter(
-				(n) =>
-					n.status === NoteStatus.payed || n.status === NoteStatus.precanceled
-			)
-			.reduce((t, n) => {
-				const payment = n.payment;
-				const entry = t.findIndex((e) => e.payment === payment);
-				if (entry === -1) {
-					const notes = [{ ...n }];
-					t.push({ payment, notes });
-				} else {
-					t[entry].notes.push(n);
-				}
-				return t;
-			}, []);
+		const totals = notes.reduce((t, n) => {
+			const payment = n.payment;
+			const entry = t.findIndex((e) => e.payment === payment);
+			if (entry === -1) {
+				const notes = [{ ...n }];
+				t.push({ payment, notes });
+			} else {
+				t[entry].notes.push(n);
+			}
+			return t;
+		}, []);
 
 		for (let pos = 0; pos < totals.length; pos++) {
 			const subtotal = totals[pos].notes.reduce((t, n) => {
@@ -109,21 +78,6 @@ const CutoffView = () => {
 
 		return discount ? subTotal - discount : subTotal;
 	};
-
-	const getTotalPayments = () => {
-		return payments.reduce((previousValue, p) => previousValue + +p.amount, 0);
-	};
-
-	const handleDateCutoff = (event) => {
-		setDateCutoff(event.target.value);
-		setErrorMessage("");
-		setTotals([]);
-		setNotes([emptyNote]);
-		setNotesView([]);
-		loadNotes(event.target.value);
-		loadPayments(event.target.value);
-	};
-
 	return (
 		<React.Fragment>
 			<Header />
@@ -133,15 +87,14 @@ const CutoffView = () => {
 			)}
 			<main className="max-w-screen-xl mx-auto p-4 min-h-screen">
 				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
-					<h1 className="text-4xl text-center">Corte de Caja</h1>
+					<h1 className="text-4xl text-center">
+						{status === NoteStatus.precanceled
+							? "Aut. cancelacion de notas"
+							: status === NoteStatus.preauth
+							? "Aut. notas de cascos"
+							: "Creditos"}
+					</h1>
 					<div className="m-3">
-						<InputControl
-							name="date"
-							label="Fecha"
-							type="date"
-							value={dateCutoff}
-							onChange={handleDateCutoff}
-						/>
 						{notes && (
 							<>
 								<table className="border-separate text-left border-flame-700 mt-5 w-full">
@@ -173,16 +126,6 @@ const CutoffView = () => {
 													</td>
 												</tr>
 											))}
-										{payments.length > 0 && (
-											<tr className="text-gray-800" key={"abonos"}>
-												<td className="border-t-2 border-yellow-600 font-light px-2">
-													Abonos
-												</td>
-												<td className="border-t-2 border-yellow-600 font-light px-2 text-right">
-													$ {getTotalPayments()}
-												</td>
-											</tr>
-										)}
 									</tbody>
 								</table>
 								<table className="border-separate text-left border-flame-700 mt-5 w-full">
@@ -209,8 +152,7 @@ const CutoffView = () => {
 										{notesView.map((note) => (
 											<tr
 												className={
-													note.status === NoteStatus.canceled ||
-													note.status === NoteStatus.preauth
+													note.status === "canceled"
 														? "text-red-600"
 														: "text-gray-800"
 												}
@@ -231,11 +173,23 @@ const CutoffView = () => {
 														`$ ${getNoteTotal(note.order, note.discount)}`}
 												</td>
 												<td className="border-t-2 border-yellow-600 font-light px-2 text-right">
-													{note.order?.detail && (
+													{note.order?.detail && status !== NoteStatus.credit && (
 														<Link
 															to={{
 																pathname: `/note/${note.noteId}`,
-																query: { note, action: "payed" },
+																query: { note, action: status },
+															}}
+															className="btn btn-tertiary"
+														>
+															Ver
+															<i className="fa fa-arrow-right ml-2"></i>
+														</Link>
+													)}
+													{note.order?.detail && status === NoteStatus.credit && (
+														<Link
+															to={{
+																pathname: `/payment/${note.noteId}`,
+																query: { note, action: status },
 															}}
 															className="btn btn-tertiary"
 														>
@@ -267,4 +221,4 @@ const CutoffView = () => {
 	);
 };
 
-export default CutoffView;
+export default NotesPrecanceled;

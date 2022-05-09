@@ -11,26 +11,26 @@ import { getIcon } from "../../common/tools/getIcon";
 import Modal from "../common/Modal";
 
 const SideMenu = ({ show }) => {
-	const { authToken, profile } = useContext(AuthContext);
+	const { authToken, profile, menu, setMenu, cleanSession } =
+		useContext(AuthContext);
 
 	const history = useHistory();
 	const [showModal, setShowModal] = useState(false);
-	const [menu, setMenu] = useState([]);
 
 	useEffect(() => {
 		if (menu.length) return;
 
-		authService
-			.userMenu(authToken)
-			.then(({ data }) => {
-				if (data.data?.length && profile) {
-					const menu = data.data.filter((m) =>
-						m.role.find((r) => r === profile.role)
-					);
-					setMenu(menu);
-				}
-			})
-			.catch();
+		const fetchMenu = async () => {
+			const resp = await authService.userMenu(authToken);
+			if (resp.data?.data && profile) {
+				const menu = resp.data.data.filter((m) =>
+					m.role.find((r) => r === profile.role)
+				);
+				setMenu(menu);
+			}
+		};
+
+		fetchMenu().catch((err) => console.log(err.message));
 	}, [authToken, profile]);
 
 	function displayModal() {
@@ -45,6 +45,8 @@ const SideMenu = ({ show }) => {
 		localStorage.removeItem("token");
 		authFirebase.auth().signOut();
 		history.push("/");
+		setMenu([]);
+		cleanSession();
 	}
 
 	return (

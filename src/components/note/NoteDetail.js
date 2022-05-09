@@ -6,12 +6,16 @@ import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
 import { PaymentMethod } from "../../common/types/PaymentMethod";
+import { NoteStatus } from "../../common/types/NoteStatus";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
 
 import storeService from "../../services/store.service";
 
 const NoteDetail = (props) => {
+	const isCancel = props.location.query?.action === NoteStatus.precanceled;
+
+	const [action, setAction] = useState(props.location.query?.action);
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [note, setNote] = useState(props.location.query?.note);
@@ -34,12 +38,23 @@ const NoteDetail = (props) => {
 
 	const handleCancelNote = () => {
 		setErrorMessage("");
-		setModalSetting({
-			...modalSetting,
-			okFn: cancelNote,
-			cancelFn: closeModal,
-			show: true,
-		});
+		if (action === NoteStatus.preauth) {
+			setModalSetting({
+				...modalSetting,
+				title: "Autorizar nota",
+				msg: "¿Desea autorizar la nota?",
+				okFn: preCancelNote,
+				cancelFn: closeModal,
+				show: true,
+			});
+		} else {
+			setModalSetting({
+				...modalSetting,
+				okFn: isCancel ? cancelNote : preCancelNote,
+				cancelFn: closeModal,
+				show: true,
+			});
+		}
 	};
 
 	const cancelNote = () => {
@@ -49,7 +64,25 @@ const NoteDetail = (props) => {
 		storeService
 			.cancelNote(note.noteId)
 			.then(({ data }) => {
-				setNote({ ...note, status: "canceled" });
+				setNote({ ...note, status: NoteStatus.canceled });
+			})
+			.finally(() => setIsLoading(false))
+			.catch((err) => {
+				setErrorMessage(err.message);
+			});
+	};
+
+	const preCancelNote = () => {
+		setIsLoading(true);
+		setModalSetting({ ...modalSetting, show: false });
+
+		const status =
+			action === NoteStatus.preauth ? NoteStatus.payed : NoteStatus.precanceled;
+
+		storeService
+			.updateNoteStatus(note.noteId, { status })
+			.then(({ data }) => {
+				setNote({ ...note, status });
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -134,12 +167,8 @@ const NoteDetail = (props) => {
 									</tr>
 									<tr className="text-center text-blue-900">
 										<th className="border-blue-900 font-light">Marca</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Descripcion
-										</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Cantidad
-										</th>
+										<th className="border-blue-900 font-light">Descripcion</th>
+										<th className="border-blue-900 font-light">Cantidad</th>
 										<th className="border-blue-900 font-light hidden md:table-cell">
 											Precio
 										</th>
@@ -154,10 +183,10 @@ const NoteDetail = (props) => {
 											<td className="border-t-2 border-yellow-600 font-light px-2">
 												{d.product.brand}
 											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+											<td className="border-t-2 border-yellow-600">
 												{d.product.description}
 											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+											<td className="border-t-2 border-yellow-600">
 												{d.amount}
 											</td>
 											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
@@ -173,17 +202,38 @@ const NoteDetail = (props) => {
 						</>
 					)}
 					<div className="flex justify-between">
-						<Link to="/cutoff" className="btn btn-tertiary">
-							Regresar
-						</Link>
+						{isCancel && (
+							<Link to="/cancel/precanceled" className="btn btn-tertiary">
+								Regresar
+							</Link>
+						)}
+						{action === NoteStatus.payed && (
+							<Link to="/cutoff" className="btn btn-tertiary">
+								Regresar
+							</Link>
+						)}
+						{action === NoteStatus.preauth && (
+							<Link to="/auth/preauth" className="btn btn-tertiary">
+								Regresar
+							</Link>
+						)}
 						{note && (
 							<button
 								className="btn btn-primary cursor-pointer font-bold"
 								type="button"
 								onClick={handleCancelNote}
-								disabled={isLoading || note.status === "canceled"}
+								disabled={
+									isLoading ||
+									(!isCancel && note.status === NoteStatus.precanceled) ||
+									(!isCancel &&
+										note.status === NoteStatus.payed &&
+										action === NoteStatus.preauth) ||
+									(isCancel && note.status === NoteStatus.canceled)
+								}
 							>
-								Cancelar Nota
+								{isCancel || action === NoteStatus.preauth
+									? "Autorizar"
+									: "Cancelar Nota"}
 							</button>
 						)}
 					</div>

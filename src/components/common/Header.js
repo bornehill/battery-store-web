@@ -33,7 +33,9 @@ const Header = () => {
 						<div className="p-4 border-b-2 border-yellow-600 md:flex md:items-center md:justify-between">
 							<div className="flex items-center">
 								<IconContext.Provider
-									value={{ className: "m-3 text-onyx-700" }}
+									value={{
+										className: "m-3 text-onyx-700 text-4xl md:text-2xl",
+									}}
 								>
 									<GiHamburgerMenu onClick={handleOpenMenu} />
 								</IconContext.Provider>

@@ -18,6 +18,8 @@ import ProfileManagement from "./components/profile/ProfileManagement";
 import LoginView from "./components/login/LoginView";
 import InventoryRequestView from "./components/inventory/InventoryRequestView";
 import InventoryRequestDetail from "./components/inventory/InventoryRequestDetail";
+import NotesAutorization from "./components/note/NotesAutorization";
+import CreditPayment from "./components/note/CreditPayment";
 
 export const routes = [
 	{
@@ -94,6 +96,22 @@ export const routes = [
 	{
 		path: "/authrequest/:id",
 		component: InventoryRequestDetail,
+	},
+	{
+		path: "/cancel/:status",
+		component: NotesAutorization,
+	},
+	{
+		path: "/auth/:status",
+		component: NotesAutorization,
+	},
+	{
+		path: "/pay/:status",
+		component: NotesAutorization,
+	},
+	{
+		path: "/payment/:noteId",
+		component: CreditPayment,
 	},
 ];
 

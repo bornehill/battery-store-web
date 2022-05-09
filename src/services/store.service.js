@@ -329,6 +329,21 @@ class StoreService extends BaseService {
 		return Promise.resolve({ data: null });
 	}
 
+	getNotesByStatus(status) {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get(`/notes/${status}`, config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
 	cancelNote(noteId) {
 		const token = localStorage.getItem("token");
 
@@ -343,7 +358,56 @@ class StoreService extends BaseService {
 			],
 		};
 
-		return this.instance.post(`/note/${noteId}`, {}, requestConfig);
+		return this.instance.post(`/note/cancel/${noteId}`, {}, requestConfig);
+	}
+
+	updateNoteStatus(noteId, status) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.put(`/note/status/${noteId}`, status, requestConfig);
+	}
+
+	getPayments(filter) {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get(`/payment?${filter}`, config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
+
+	payCredit(payment) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					return data.data;
+				},
+			],
+		};
+
+		return this.instance.post("/payment", payment, requestConfig);
 	}
 }
 

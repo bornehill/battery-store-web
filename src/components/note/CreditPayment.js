@@ -5,48 +5,56 @@ import format from "date-fns/format";
 import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
+import { PaymentMethod } from "../../common/types/PaymentMethod";
+import { NoteStatus } from "../../common/types/NoteStatus";
 import Modal from "../common/Modal";
 import * as ModalTemplates from "../../common/types/ModalTemplates";
 
 import storeService from "../../services/store.service";
 
-const OrderDetail = (props) => {
+const CreditPayment = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [order, setOrder] = useState(props.location.query?.order);
+	const [note, setNote] = useState(props.location.query?.note);
 	const [modalSetting, setModalSetting] = useState({
-		...ModalTemplates.ModalCancelOrder,
+		...ModalTemplates.ModalCreditPayment,
 	});
 
-	const getOrderTotal = () => {
-		return order.detail.reduce(
+	const getNoteTotal = (order, discount) => {
+		const subTotal = order.detail.reduce(
 			(previousValue, p) => previousValue + +p.amount * +p.product.price,
 			0
 		);
+
+		return discount ? subTotal - discount : subTotal;
 	};
 
 	const closeModal = () => {
 		setModalSetting({ ...modalSetting, show: false });
 	};
 
-	const handleCancelOrder = () => {
+	const handlePayCredit = () => {
 		setErrorMessage("");
 		setModalSetting({
 			...modalSetting,
-			okFn: cancelOrder,
+			okFn: payNote,
 			cancelFn: closeModal,
 			show: true,
 		});
 	};
 
-	const cancelOrder = () => {
+	const payNote = () => {
 		setIsLoading(true);
 		setModalSetting({ ...modalSetting, show: false });
 
 		storeService
-			.cancelOrder(order.orderId)
+			.payCredit({
+				noteId: note.noteId,
+				noteNo: note.noteNo,
+				amount: getNoteTotal(note.order, note.discount),
+			})
 			.then(({ data }) => {
-				setOrder({ ...order, status: "canceled" });
+				setNote({ ...note, status: NoteStatus.payed });
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -64,25 +72,33 @@ const OrderDetail = (props) => {
 			)}
 			<main className="max-w-screen-xl mx-auto p-4 min-h-screen">
 				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
-					<h1 className="text-4xl text-center">Detalle de orden</h1>
-					{order && (
+					<h1 className="text-4xl text-center">Detalle de nota</h1>
+					{note && (
 						<>
 							<table className="border-separate text-left border-flame-700 mt-5 w-full">
 								<tbody>
 									<tr>
 										<th className="border-t-2 border-yellow-900 text-center">
-											Orden
+											Nota
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{order.orderId}
+											{note.noteNo ?? note.noteId}
 										</td>
 									</tr>
 									<tr>
 										<th className="border-t-2 border-yellow-900 text-center">
-											Vendedor
+											Cliente
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{order.sellerName}
+											{note.clientName}
+										</td>
+									</tr>
+									<tr>
+										<th className="border-t-2 border-yellow-900 text-center">
+											Tipo Pago
+										</th>
+										<td className="border-t-2 border-yellow-900 text-center">
+											{PaymentMethod[note.payment]}
 										</td>
 									</tr>
 									<tr>
@@ -90,7 +106,15 @@ const OrderDetail = (props) => {
 											Fecha/Hora
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											{format(new Date(order.date), "dd/MM/yyyy HH:mm:ss")}
+											{format(new Date(note.date), "dd/MM/yyyy HH:mm:ss")}
+										</td>
+									</tr>
+									<tr>
+										<th className="border-t-2 border-yellow-900 text-center">
+											Descuento
+										</th>
+										<td className="border-t-2 border-yellow-900 text-center">
+											${note.discount ?? 0}
 										</td>
 									</tr>
 									<tr>
@@ -98,7 +122,7 @@ const OrderDetail = (props) => {
 											Total
 										</th>
 										<td className="border-t-2 border-yellow-900 text-center">
-											${getOrderTotal()}
+											${getNoteTotal(note.order, note.discount)}
 										</td>
 									</tr>
 								</tbody>
@@ -126,15 +150,15 @@ const OrderDetail = (props) => {
 									</tr>
 								</thead>
 								<tbody>
-									{order.detail.map((d) => (
+									{note.order.detail.map((d) => (
 										<tr className="text-gray-800" key={d.product._id}>
 											<td className="border-t-2 border-yellow-600 font-light px-2">
 												{d.product.brand}
 											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2">
+											<td className="border-t-2 border-yellow-600">
 												{d.product.description}
 											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2">
+											<td className="border-t-2 border-yellow-600">
 												{d.amount}
 											</td>
 											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
@@ -150,17 +174,17 @@ const OrderDetail = (props) => {
 						</>
 					)}
 					<div className="flex justify-between">
-						<Link to="/checkorders" className="btn btn-tertiary">
+						<Link to="/pay/credit" className="btn btn-tertiary">
 							Regresar
 						</Link>
-						{order && (
+						{note && (
 							<button
 								className="btn btn-primary cursor-pointer font-bold"
 								type="button"
-								onClick={handleCancelOrder}
-								disabled={isLoading || order.status === "canceled"}
+								onClick={handlePayCredit}
+								disabled={isLoading || note.status === NoteStatus.payed}
 							>
-								Cancelar Orden
+								Pagar credito
 							</button>
 						)}
 					</div>
@@ -171,4 +195,4 @@ const OrderDetail = (props) => {
 	);
 };
 
-export default OrderDetail;
+export default CreditPayment;

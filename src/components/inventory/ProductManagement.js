@@ -3,6 +3,7 @@ import React, { useReducer, useEffect, useState } from "react";
 import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
 import Footer from "../common/Footer";
+import Paginate from "../common/Paginate";
 import SelectControl from "../form-controls/SelectControl";
 import ProductForm from "./ProductForm";
 
@@ -29,6 +30,8 @@ const ProductManagement = () => {
 	const [brandSelected, setBrandSelected] = useState("Casco");
 	const [brands, setBrands] = useState([]);
 	const [hasAddProductFailed, setHasAddProductFailed] = useState(false);
+	const [productsView, setProductsView] = useState([]);
+	const [page, setPage] = useState(1);
 	const [{ products }, dispatch] = useReducer(requestReducer, {
 		status: REQUEST_STATUS.LOADING,
 		products: [],
@@ -60,10 +63,13 @@ const ProductManagement = () => {
 			.then(({ data }) => {
 				if (data) {
 					data.data.sort(sortByDescription).sort(sortByGroup);
+					const elements = [...data.data];
 					dispatch({
-						products: [...data.data],
+						products: [...elements],
 						type: PRODUCTS_LOADED,
 					});
+					setPage(1);
+					setProductsView(elements.slice(0, 10));
 				}
 			})
 			.finally(() => {
@@ -88,6 +94,10 @@ const ProductManagement = () => {
 		loadProducts(brandSelected);
 		setProductSelected({ ...emptyProduct, id: "1" });
 	}
+
+	const handlePaginate = (elements) => {
+		setProductsView(elements);
+	};
 
 	const handleError = () => {
 		setHasAddProductFailed(true);
@@ -139,60 +149,69 @@ const ProductManagement = () => {
 							/>
 						</div>
 						{products && products.length ? (
-							<table className="border-separate text-left border-flame-700">
-								<thead>
-									<tr className="text-center text-blue-900">
-										<th className="border-blue-900 font-light">Marca</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Descripcion
-										</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Grupo
-										</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Ampers
-										</th>
-										<th className="border-blue-900 font-light">Precio</th>
-										<th className="border-blue-900 font-light">Accion</th>
-									</tr>
-								</thead>
-								<tbody>
-									{products.map((product) => (
-										<tr className="text-gray-800" key={product.id}>
-											<td className="border-t-2 border-yellow-600 font-light px-2">
-												{product.brand}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												{product.description}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												{product.group}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
-												{product.amp}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2">
-												$ {product.price}
-											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 flex">
-												<IconContext.Provider
-													value={{
-														className: "m-3 text-flame-700",
-														size: "20px",
-													}}
-												>
-													<MdEdit
-														key={"edit_" + product.id}
-														className="cursor-pointer"
-														onClick={() => handleSelectItem(product)}
-														title="Actualizar producto"
-													/>
-												</IconContext.Provider>
-											</td>
+							<>
+								<table className="border-separate text-left border-flame-700">
+									<thead>
+										<tr className="text-center text-blue-900">
+											<th className="border-blue-900 font-light">Marca</th>
+											<th className="border-blue-900 font-light hidden md:table-cell">
+												Descripcion
+											</th>
+											<th className="border-blue-900 font-light hidden md:table-cell">
+												Grupo
+											</th>
+											<th className="border-blue-900 font-light hidden md:table-cell">
+												Ampers
+											</th>
+											<th className="border-blue-900 font-light">Precio</th>
+											<th className="border-blue-900 font-light">Accion</th>
 										</tr>
-									))}
-								</tbody>
-							</table>
+									</thead>
+									<tbody>
+										{productsView.map((product) => (
+											<tr className="text-gray-800" key={product.id}>
+												<td className="border-t-2 border-yellow-600 font-light px-2">
+													{product.brand}
+												</td>
+												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+													{product.description}
+												</td>
+												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+													{product.group}
+												</td>
+												<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+													{product.amp}
+												</td>
+												<td className="border-t-2 border-yellow-600 font-light px-2">
+													$ {product.price}
+												</td>
+												<td className="border-t-2 border-yellow-600 font-light px-2 flex">
+													<IconContext.Provider
+														value={{
+															className: "m-3 text-flame-700",
+															size: "20px",
+														}}
+													>
+														<MdEdit
+															key={"edit_" + product.id}
+															className="cursor-pointer"
+															onClick={() => handleSelectItem(product)}
+															title="Actualizar producto"
+														/>
+													</IconContext.Provider>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+								<Paginate
+									page={page}
+									setPage={setPage}
+									elements={products}
+									elementsByPage={10}
+									dispatchUpdateView={handlePaginate}
+								/>
+							</>
 						) : (
 							<div className="text-2xl text-flame-700">
 								{isLoading ? "Cargando..." : "No hay productos para mostrar."}

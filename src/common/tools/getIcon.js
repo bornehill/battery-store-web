@@ -12,6 +12,7 @@ import {
 	FaCashRegister,
 	FaClipboardList,
 	FaFileInvoiceDollar,
+	FaRegCreditCard,
 	FaStore,
 	FaUsersCog,
 } from "react-icons/fa";
@@ -44,6 +45,8 @@ export function getIcon(icon) {
 			return <AiOutlineBook />;
 		case "FaBookReader":
 			return <FaBookReader />;
+		case "FaRegCreditCard":
+			return <FaRegCreditCard />;
 		case "FaUsersCog":
 			return <FaUsersCog />;
 		case "FaUnlockAlt":
