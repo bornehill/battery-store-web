@@ -127,3 +127,13 @@ export const ModalCreditPayment = {
 	okFn: null,
 	cancelFn: null,
 };
+
+export const ModalServicePayment = {
+	show: false,
+	title: "Agregar servicio",
+	msg: "¿Desea agregar el servicio?",
+	okBtn: "Aceptar",
+	cancelBtn: "Cancelar",
+	okFn: null,
+	cancelFn: null,
+};

@@ -146,7 +146,12 @@ class ProductForm extends Form {
 								"name"
 							)
 						)}
-						{this.renderInput("description", "Descripcion")}
+						{this.renderInput(
+							"description",
+							"Descripcion",
+							"text",
+							!!this.state.data._id
+						)}
 						{this.renderInput("price", "Precio", "number")}
 						{this.renderInput("amp", "Amperaje")}
 						{this.renderDropDown("group", "Grupo", mapEnumToDropdown(Groups))}

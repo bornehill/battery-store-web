@@ -192,15 +192,11 @@ const InventoryManagement = () => {
 									</tr>
 									<tr className="text-center text-blue-900">
 										<th className="border-blue-900 font-light">Marca</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Descripcion
-										</th>
+										<th className="border-blue-900 font-light">Descripcion</th>
 										<th className="border-blue-900 font-light hidden md:table-cell">
 											Grupo
 										</th>
-										<th className="border-blue-900 font-light hidden md:table-cell">
-											Cantidad
-										</th>
+										<th className="border-blue-900 font-light">Cantidad</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -209,13 +205,13 @@ const InventoryManagement = () => {
 											<td className="border-t-2 border-yellow-600 font-light px-2">
 												{mov.product.brand}
 											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+											<td className="border-t-2 border-yellow-600 font-light px-2">
 												{mov.product.description}
 											</td>
 											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
 												{mov.product.group}
 											</td>
-											<td className="border-t-2 border-yellow-600 font-light px-2 hidden md:table-cell">
+											<td className="border-t-2 border-yellow-600 font-light px-2">
 												{mov.amount}
 											</td>
 										</tr>

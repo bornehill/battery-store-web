@@ -14,6 +14,7 @@ import {
 	FaFileInvoiceDollar,
 	FaRegCreditCard,
 	FaStore,
+	FaTools,
 	FaUsersCog,
 } from "react-icons/fa";
 import { SiBrandfolder } from "react-icons/si";
@@ -51,6 +52,8 @@ export function getIcon(icon) {
 			return <FaUsersCog />;
 		case "FaUnlockAlt":
 			return <FaUnlockAlt />;
+		case "FaTools":
+			return <FaTools />;
 		default:
 			return <FaUserCircle />;
 	}

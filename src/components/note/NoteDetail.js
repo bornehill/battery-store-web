@@ -224,7 +224,9 @@ const NoteDetail = (props) => {
 								onClick={handleCancelNote}
 								disabled={
 									isLoading ||
-									(!isCancel && note.status === NoteStatus.precanceled) ||
+									(!isCancel &&
+										(note.status === NoteStatus.precanceled ||
+											note.status === NoteStatus.canceled)) ||
 									(!isCancel &&
 										note.status === NoteStatus.payed &&
 										action === NoteStatus.preauth) ||

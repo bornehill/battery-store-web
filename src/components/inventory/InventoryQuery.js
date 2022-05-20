@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import Header from "../common/Header";
 import LoadingBar from "../common/LoadingBar";
-import Footer from "../common/Footer";
 import Paginate from "../common/Paginate";
 import SelectControl from "../form-controls/SelectControl";
 
@@ -23,6 +22,7 @@ const InventoryQuery = () => {
 	const [inventoryPage, setInventoryPage] = useState([]);
 	const [brands, setBrands] = useState([]);
 	const [page, setPage] = useState(1);
+	const [totalGroups, setTotalGroups] = useState([]);
 
 	useEffect(() => {
 		if (locations.length) return;
@@ -50,23 +50,16 @@ const InventoryQuery = () => {
 	}, [brands]);
 
 	function handleLocationChange(event) {
-		setError("");
 		setLocationSelected(event.target.value);
-		setBrandSelected("0");
-		setInventory([]);
-		setInventoryView([]);
-		setInventoryPage([]);
+		cleanData();
 		setIsLoading(true);
-		setPage(1);
 		const loc = locations.find((l) => l._id === event.target.value);
 		storeService
 			.getInventory(loc.name)
 			.then(({ data }) => {
 				if (data.data.length) {
 					const view = data.data;
-					setInventory(view);
-					setInventoryView(view);
-					setInventoryPage(view.slice(0, 10));
+					popupData(view);
 				}
 				setIsLoading(false);
 			})
@@ -74,6 +67,34 @@ const InventoryQuery = () => {
 				setError(err);
 			});
 	}
+
+	const cleanData = () => {
+		setError("");
+		setBrandSelected("0");
+		setInventory([]);
+		setInventoryView([]);
+		setInventoryPage([]);
+		setTotalGroups([]);
+		setPage(1);
+	};
+
+	const popupData = (view) => {
+		const totals = view.reduce((t, n) => {
+			const group = n.product.group;
+			const entry = t.findIndex((e) => e.group === group);
+			if (entry === -1) {
+				t.push({ group, amount: n.amount });
+			} else {
+				t[entry].amount = t[entry].amount + n.amount;
+			}
+			return t;
+		}, []);
+
+		setTotalGroups(totals);
+		setInventory(view);
+		setInventoryView(view);
+		setInventoryPage(view.slice(0, 10));
+	};
 
 	function handleBrandChange(event) {
 		setIsLoading(true);
@@ -96,10 +117,10 @@ const InventoryQuery = () => {
 		<React.Fragment>
 			<Header />
 			<main>
-				<div className="w-full h-screen md:max-w-md md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
+				<div className="w-full h-screen md:max-w-xl md:rounded-sm md:mx-auto md:h-auto relative min-h-screen mb-10">
 					{isLoading && <LoadingBar />}
 					<div className="p-10">
-						<h1 className="text-4xl">Consulta de inventario</h1>
+						<h1 className="md:text-center text-4xl">Consulta de inventario</h1>
 						<div className="m-3">
 							<SelectControl
 								name="location"
@@ -112,11 +133,45 @@ const InventoryQuery = () => {
 								name="brand"
 								label="Marca"
 								value={brandSelected}
-								options={mapListToDropdown(brands, "name", "name")}
+								options={mapListToDropdown(
+									[{ name: "Seleccionar" }, ...brands],
+									"name",
+									"name"
+								)}
 								onChange={handleBrandChange}
 							/>
 							{inventoryView && (
 								<>
+									{totalGroups.length > 0 && (
+										<table className="border-separate text-left border-flame-700 mt-5 w-full">
+											<thead>
+												<tr>
+													<th></th>
+													{totalGroups.map((g) => (
+														<th
+															className="border-b-2 border-yellow-900 text-center"
+															key={"name_" + g.group}
+														>
+															{g.group}
+														</th>
+													))}
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Total</td>
+													{totalGroups.map((g) => (
+														<td
+															className="text-center font-light"
+															key={"amount_" + g.group}
+														>
+															{g.amount}
+														</td>
+													))}
+												</tr>
+											</tbody>
+										</table>
+									)}
 									<table className="border-separate text-left border-flame-700 mt-5 w-full">
 										<thead>
 											<tr>
@@ -174,7 +229,6 @@ const InventoryQuery = () => {
 					</div>
 				</div>
 			</main>
-			<Footer />
 		</React.Fragment>
 	);
 };

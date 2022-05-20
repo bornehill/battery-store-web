@@ -5,7 +5,7 @@ const Modal = ({ show, title, msg, okBtn, cancelBtn, okFn, cancelFn }) => {
 		<>
 			{show && (
 				<div
-					className="fixed z-10 inset-0 overflow-y-auto"
+					className="fixed z-10 inset-0 overflow-y-auto z-50"
 					aria-labelledby="modal-title"
 					role="dialog"
 					aria-modal="true"

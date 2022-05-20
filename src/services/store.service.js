@@ -409,6 +409,39 @@ class StoreService extends BaseService {
 
 		return this.instance.post("/payment", payment, requestConfig);
 	}
+
+	addService(service) {
+		const token = localStorage.getItem("token");
+
+		const requestConfig = {
+			headers: {
+				"x-auth-token": `Bearer ${token}`,
+			},
+			transformResponse: [
+				(data) => {
+					const response = JSON.parse(data);
+					return response.data;
+				},
+			],
+		};
+
+		return this.instance.post("/service", service, requestConfig);
+	}
+
+	getService(filter) {
+		const token = localStorage.getItem("token");
+		if (token) {
+			const config = {
+				headers: {
+					"x-auth-token": `Bearer ${token}`,
+				},
+			};
+
+			return this.instance.get(`/service?${filter}`, config);
+		}
+
+		return Promise.resolve({ data: null });
+	}
 }
 
 export default new StoreService();

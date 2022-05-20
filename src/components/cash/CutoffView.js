@@ -24,6 +24,7 @@ const CutoffView = () => {
 	const [totals, setTotals] = useState([]);
 	const [notesView, setNotesView] = useState([]);
 	const [payments, setPayments] = useState([]);
+	const [services, setServices] = useState([]);
 	const [page, setPage] = useState(1);
 
 	useEffect(() => {
@@ -36,6 +37,12 @@ const CutoffView = () => {
 		if (payments.length) return;
 
 		loadPayments(dateCutoff);
+	}, [notes]);
+
+	useEffect(() => {
+		if (services.length) return;
+
+		loadService(dateCutoff);
 	}, [notes]);
 
 	const loadNotes = (start) => {
@@ -59,6 +66,20 @@ const CutoffView = () => {
 			.getPayments(`start=${start}`)
 			.then(({ data }) => {
 				if (data?.data?.length) setPayments([...data.data]);
+			})
+			.finally(() => setIsLoading(false))
+			.catch((err) => {
+				setErrorMessage(err.message);
+			});
+	};
+
+	const loadService = (start) => {
+		setIsLoading(true);
+
+		storeService
+			.getService(`start=${start}`)
+			.then(({ data }) => {
+				if (data?.data?.length) setServices([...data.data]);
 			})
 			.finally(() => setIsLoading(false))
 			.catch((err) => {
@@ -114,14 +135,21 @@ const CutoffView = () => {
 		return payments.reduce((previousValue, p) => previousValue + +p.amount, 0);
 	};
 
+	const getTotalServices = () => {
+		return services.reduce((previousValue, p) => previousValue + +p.amount, 0);
+	};
+
 	const handleDateCutoff = (event) => {
 		setDateCutoff(event.target.value);
 		setErrorMessage("");
 		setTotals([]);
 		setNotes([emptyNote]);
 		setNotesView([]);
+		setServices([]);
+		setPayments([]);
 		loadNotes(event.target.value);
 		loadPayments(event.target.value);
+		loadService(event.target.value);
 	};
 
 	return (
@@ -180,6 +208,16 @@ const CutoffView = () => {
 												</td>
 												<td className="border-t-2 border-yellow-600 font-light px-2 text-right">
 													$ {getTotalPayments()}
+												</td>
+											</tr>
+										)}
+										{services.length > 0 && (
+											<tr className="text-gray-800" key={"servicios"}>
+												<td className="border-t-2 border-yellow-600 font-light px-2">
+													Servicios
+												</td>
+												<td className="border-t-2 border-yellow-600 font-light px-2 text-right">
+													$ {getTotalServices()}
 												</td>
 											</tr>
 										)}

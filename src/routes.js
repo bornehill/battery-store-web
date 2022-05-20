@@ -4,6 +4,7 @@ import Home from "./components/home/Home";
 import SignupView from "./components/login/SignupView";
 import CashView from "./components/cash/CashView";
 import CutoffView from "./components/cash/CutoffView";
+import ServiceForm from "./components/cash/ServiceForm";
 import BrandManagement from "./components/inventory/BrandManagement";
 import InventoryManagement from "./components/inventory/InventoryManagement";
 import InventoryQuery from "./components/inventory/InventoryQuery";
@@ -112,6 +113,10 @@ export const routes = [
 	{
 		path: "/payment/:noteId",
 		component: CreditPayment,
+	},
+	{
+		path: "/service",
+		component: ServiceForm,
 	},
 ];
 
